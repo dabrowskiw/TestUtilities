@@ -18,7 +18,8 @@ public class TestUtilities {
     public static String getArgumentsValues(Object... arguments) {
         StringBuilder args = new StringBuilder();
         for(int i=0; i<arguments.length; i++) {
-            args.append(arguments[i].toString());
+//            args.append(arguments[i].toString());
+            args.append(objectToString(arguments[i], 3));
             if(i != arguments.length-1) {
                 args.append(", ");
             }
@@ -123,6 +124,7 @@ public class TestUtilities {
                     "): Objekt ist null.");
             throw new TestException(errorBuilder.toString());
         }
+        errorBuilder.append("Nach Methoden-Aufruf " + toCall.getName() + "(" + getArgumentsValues(arguments) + "): ");
         Object res = toCall.invoke(toCallObj, arguments);
         if(mdata.getReturnKlass().equals(void.class)) {
             return res;
@@ -135,7 +137,7 @@ public class TestUtilities {
         }
         String differenceMessage = objectEquals(res, expected, roundDecimals);
         if(differenceMessage != null) {
-            errorBuilder.append("Methoden-Aufruf " + toCall.getName() + "(" + getArgumentsValues(arguments) + ") liefert \"" +
+            errorBuilder.append("liefert \"" +
                     objectToString(res, roundDecimals) + "\", aber erwartet war \"" + objectToString(expected, roundDecimals) + "\"" +
                     (roundDecimals==0?"":" (gerundet auf " + roundDecimals + " Nachkomma-Stellen)") + differenceMessage);
             throw new TestException(errorBuilder.toString());

@@ -1,9 +1,6 @@
 package org.htw.prog1.testutils;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.util.*;
@@ -30,7 +27,7 @@ public class TestUtilities {
     public static String getArgumentsList(Class... arguments) {
         StringBuilder args = new StringBuilder();
         for(int i=0; i<arguments.length; i++) {
-            args.append(arguments[i].getName());
+            args.append(arguments[i].getCanonicalName());
             if(i != arguments.length-1) {
                 args.append(", ");
             }
@@ -112,7 +109,7 @@ public class TestUtilities {
     }
 
     public static Object assertCallEquals(StringBuilder errorBuilder, int roundDecimals, MethodData mdata, Object toCallObj) throws Exception {
-        Method toCall = getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.getArgumentKlasses());
+        Method toCall = getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.isStaticMethod(), mdata.getArgumentKlasses());
         return assertCallEquals(errorBuilder, roundDecimals, mdata, toCallObj, toCall);
     }
 
@@ -166,16 +163,19 @@ public class TestUtilities {
         return res;
     }
 
-    public static Method getMethod(Class klass, String name, Class returnType, Class... arguments) throws Exception {
+    public static Method getMethod(Class klass, String name, Class returnType, boolean isStatic, Class... arguments) throws Exception {
         Method res = null;
         try {
             res = klass.getMethod(name, arguments);
         }
         catch(Exception e) {
-            throw new TestException("Keine public-Methode " + returnType.toString() + " " + name + "(" + getArgumentsList(arguments) + ") in der Klasse " + klass.getName() + " definiert.");
+            throw new TestException("Keine public-Methode " + returnType.getCanonicalName() + " " + name + "(" + getArgumentsList(arguments) + ") in der Klasse " + klass.getName() + " definiert.");
         }
         if(!res.getReturnType().equals(returnType)) {
-            throw new TestException("Methode " + name + " in Klasse " + klass.getName() + " sollte " + returnType.getName() + " zurückgeben, gibt aber " + res.getReturnType() + " zurück.");
+            throw new TestException("Methode " + returnType.getCanonicalName() + " " + name + "(" + getArgumentsList(arguments) + ") in Klasse " + klass.getName() + " sollte " + returnType.getName() + " zurückgeben, gibt aber " + res.getReturnType() + " zurück.");
+        }
+        if(isStatic && !Modifier.isStatic(res.getModifiers())) {
+            throw new TestException("Methode " + returnType.getCanonicalName() + " " + name + "(" + getArgumentsList(arguments) + ") in Klasse " + klass.getName() + " sollte static sein, ist es aber nicht.");
         }
         return res;
     }

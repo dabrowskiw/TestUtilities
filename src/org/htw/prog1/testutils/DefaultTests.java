@@ -28,7 +28,7 @@ public class DefaultTests {
 
     public Object staticMethodTest(MethodData mdata, int roundDecimals) {
         try {
-            Method m = TestUtilities.getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.getArgumentKlasses());
+            Method m = TestUtilities.getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.isStaticMethod(), mdata.getArgumentKlasses());
             return TestUtilities.assertCallEquals(errorBuilder, roundDecimals, mdata, null, m);
         } catch (TestException e) {
             fail(e.getTestExceptionMessage());
@@ -41,7 +41,7 @@ public class DefaultTests {
     public Object singleMethodTest(ConstructorData cdata, MethodData mdata, int roundDecimals) {
         try {
             Constructor c = TestUtilities.getContructor(cdata.getKlass(), cdata.getArgumentKlasses());
-            Method m = TestUtilities.getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.getArgumentKlasses());
+            Method m = TestUtilities.getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.isStaticMethod(), mdata.getArgumentKlasses());
             Object obj = TestUtilities.getInstance(c, errorBuilder, cdata.getArguments());
             return TestUtilities.assertCallEquals(errorBuilder, roundDecimals, mdata, obj, m);
         } catch (TestException e) {
@@ -69,7 +69,7 @@ public class DefaultTests {
         try {
             Object res = null;
             for(MethodData mdata : mdatas) {
-                Method m = TestUtilities.getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.getArgumentKlasses());
+                Method m = TestUtilities.getMethod(mdata.getKlass(), mdata.getMethodName(), mdata.getReturnKlass(), mdata.isStaticMethod(), mdata.getArgumentKlasses());
                 res = TestUtilities.assertCallEquals(errorBuilder, roundDecimals, mdata, obj, m);
             }
             if(returnLastMethodResult) {
